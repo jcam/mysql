@@ -74,9 +74,18 @@ if platform? 'windows'
   end
 end
 
+# fix for COOK-1676
+ruby_block "reset group list" do
+  block do
+    Etc.endgrent
+  end 
+  action :nothing
+end
+
 node['mysql']['server']['packages'].each do |package_name|
   package package_name do
     action :install
+    notifies :create, "ruby_block[reset group list]", :immediately
   end
 end
 
